@@ -14,11 +14,12 @@ impl Config {
         let database_url =
             env::var("DATABASE_URL").map_err(|_| "DATABASE_URL is required".to_string())?;
 
-        let submit_token =
-            env::var("SUBMIT_TOKEN").map_err(|_| "SUBMIT_TOKEN is required".to_string())?;
-        if submit_token.len() < 32 {
-            return Err("SUBMIT_TOKEN must be at least 32 characters".to_string());
-        }
+        // Any value works, but it must be set and non-empty: an empty token would let
+        // a request with an empty header through.
+        let submit_token = env::var("SUBMIT_TOKEN")
+            .ok()
+            .filter(|t| !t.is_empty())
+            .ok_or_else(|| "SUBMIT_TOKEN is required".to_string())?;
 
         // Render injects PORT automatically; 10000 is the usual default there.
         let port = match env::var("PORT") {

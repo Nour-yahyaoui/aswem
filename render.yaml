@@ -18,4 +18,4 @@ services:
       - key: DATABASE_URL
         sync: false # Neon pooled connection string, with sslmode=require
       - key: SUBMIT_TOKEN
-        sync: false # 32+ random characters, must match SUBMIT_TOKEN on Vercel
+        sync: false # any secret value, must match SUBMIT_TOKEN on Vercel

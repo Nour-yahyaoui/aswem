@@ -21,6 +21,7 @@ export function SubmitForm({
   defaultProductId?: number;
 }) {
   const [state, action, pending] = useActionState(submitPrice, initial);
+  const [productId, setProductId] = useState(defaultProductId ? String(defaultProductId) : "");
   const [governorateId, setGovernorateId] = useState("");
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
@@ -31,11 +32,12 @@ export function SubmitForm({
   useEffect(() => {
     if (state.status === "ok") {
       formRef.current?.reset();
+      setProductId(defaultProductId ? String(defaultProductId) : "");
       setGovernorateId("");
       setLat("");
       setLng("");
     }
-  }, [state]);
+  }, [state, defaultProductId]);
 
   function useMyPosition() {
     if (!navigator.geolocation) {
@@ -82,7 +84,14 @@ export function SubmitForm({
 
       <div className="space-y-2">
         <label htmlFor="product_id" className="block text-sm font-semibold">المادة</label>
-        <select id="product_id" name="product_id" required defaultValue={defaultProductId ?? ""} className={fieldClass}>
+        <select
+          id="product_id"
+          name="product_id"
+          required
+          value={productId}
+          onChange={(e) => setProductId(e.target.value)}
+          className={fieldClass}
+        >
           <option value="" disabled>اختار المادة</option>
           {products.map((p) => (
             <option key={p.id} value={p.id}>
@@ -90,7 +99,7 @@ export function SubmitForm({
             </option>
           ))}
         </select>
-        <input type="hidden" name="product_slug" value={products.find((p) => p.id === defaultProductId)?.slug ?? ""} />
+        <input type="hidden" name="product_slug" value={products.find((p) => String(p.id) === productId)?.slug ?? ""} />
       </div>
 
       <div className="space-y-2">

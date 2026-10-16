@@ -31,7 +31,7 @@ render.yaml   Render Blueprint for the API
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `DATABASE_URL` | yes | Neon pooled connection string, with `sslmode=require` |
-| `SUBMIT_TOKEN` | yes | At least 32 random characters. Must equal the web value |
+| `SUBMIT_TOKEN` | yes | Any non-empty secret. Must equal the web value |
 | `PORT` | no | Set by Render automatically |
 | `SUBMIT_PER_HOUR` | no | Default `10` submissions per client per hour |
 | `RUST_LOG` | no | Default `info` |
