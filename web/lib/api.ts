@@ -29,10 +29,18 @@ export async function apiGet<T>(path: string, revalidateSeconds = 300): Promise<
   }
   if (res.status === 404) return null;
   if (!res.ok) throw new ApiUnavailableError(`API responded with ${res.status}`);
-  return (await res.json()) as T;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    throw new ApiUnavailableError("API returned a non-JSON body");
+  }
 }
 
-/** Like apiGet, but never throws for availability problems. Pages can render a fallback instead. */
+/**
+ * Like apiGet, but never throws. Any failure (missing config, network error, bad status,
+ * non-JSON body) is reported as `failed`, so pages and the sitemap can render a fallback
+ * instead of breaking the build or the request.
+ */
 export async function tryApiGet<T>(
   path: string,
   revalidateSeconds = 300,
@@ -40,9 +48,7 @@ export async function tryApiGet<T>(
   try {
     return { data: await apiGet<T>(path, revalidateSeconds), failed: false };
   } catch (err) {
-    if (err instanceof ApiUnavailableError) {
-      return { data: null, failed: true };
-    }
-    throw err;
+    console.warn(`[api] GET ${path} failed:`, err instanceof Error ? err.message : err);
+    return { data: null, failed: true };
   }
 }

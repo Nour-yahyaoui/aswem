@@ -3,6 +3,8 @@ import { tryApiGet } from "@/lib/api";
 import { SITE } from "@/lib/site";
 import type { Product } from "@/lib/types";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE.url;
   const entries: MetadataRoute.Sitemap = [
