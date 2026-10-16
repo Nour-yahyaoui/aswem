@@ -47,17 +47,17 @@ export default async function AboutPage({ params }: Props) {
         <h2 className="text-lg font-semibold">{dict.contactTitle}</h2>
         <p className="text-sm">
           {dict.builtBy} <strong>{SITE.author}</strong>.{" "}
-          <a href={SITE.github} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-4" dir="ltr">
+          <a href={SITE.github} target="_blank" rel="noopener noreferrer" className="text-brand-text underline underline-offset-4" dir="ltr">
             GitHub: Nour-yahyaoui
           </a>{" "}
           ·{" "}
-          <a href={`tel:${SITE.phoneTel}`} className="text-brand underline underline-offset-4" dir="ltr">
+          <a href={`tel:${SITE.phoneTel}`} className="text-brand-text underline underline-offset-4" dir="ltr">
             {SITE.phoneDisplay}
           </a>
         </p>
         <p className="text-sm">
           {dict.sourceCode}{" "}
-          <a href={SITE.repo} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-4">
+          <a href={SITE.repo} target="_blank" rel="noopener noreferrer" className="text-brand-text underline underline-offset-4">
             GitHub
           </a>
           .

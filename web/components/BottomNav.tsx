@@ -35,7 +35,7 @@ export function BottomNav({ locale }: { locale: Locale }) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={`flex flex-col items-center gap-1 py-2.5 text-xs font-medium ${
-                  active ? "text-brand" : "text-neutral-500 hover:text-neutral-800"
+                  active ? "text-brand-text" : "text-neutral-500 hover:text-neutral-800"
                 }`}
               >
                 <svg

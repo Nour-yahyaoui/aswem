@@ -143,11 +143,11 @@ export default async function ProductPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structured) }} />
 
       <nav aria-label={dict.product.breadcrumbLabel} className="text-sm text-neutral-500">
-        <Link href={`/${locale}`} className="hover:text-brand">
+        <Link href={`/${locale}`} className="hover:text-brand-text">
           {dict.product.breadcrumbHome}
         </Link>
         {" / "}
-        <Link href={`/${locale}/search`} className="hover:text-brand">
+        <Link href={`/${locale}/search`} className="hover:text-brand-text">
           {dict.product.breadcrumbProducts}
         </Link>
       </nav>
@@ -162,7 +162,7 @@ export default async function ProductPage({ params }: Props) {
       <section aria-label={dict.product.summary} className="grid grid-cols-3 gap-2.5 text-center">
         <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-neutral-200">
           <p className="text-xs text-neutral-500">{dict.product.cheapestMedian}</p>
-          <p className="mt-1 text-base font-bold text-brand">
+          <p className="mt-1 text-base font-bold text-brand-text">
             {best ? formatTnd(best.median_millimes, locale) : "—"}
           </p>
           {best && <p className="text-xs text-neutral-500">{govName(best.governorate_id)}</p>}
@@ -238,7 +238,7 @@ export default async function ProductPage({ params }: Props) {
 
       <Link
         href={`/${locale}/submit?product=${encodeURIComponent(product.slug)}`}
-        className="flex h-12 items-center justify-center rounded-xl bg-brand text-base font-semibold text-white shadow-sm hover:bg-emerald-800"
+        className="flex h-12 items-center justify-center rounded-xl bg-brand text-base font-semibold text-on-brand shadow-sm hover:bg-emerald-800"
       >
         {fill(dict.product.addPriceFor, { name })}
       </Link>

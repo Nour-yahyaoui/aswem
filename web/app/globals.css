@@ -1,8 +1,50 @@
 @import "tailwindcss";
 
+/* Dark mode is toggled by a `dark` class on <html> (see lib/theme.ts). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand: #047857;
+  --color-brand-text: #047857;
   --color-brand-soft: #ecfdf5;
+  --color-on-brand: #ffffff;
+}
+
+/*
+ * Dark palette. The neutral and surface colours are remapped, so every existing
+ * `bg-white`, `text-neutral-900`, `border-neutral-200`, and similar class adapts.
+ * Brand button text (`text-on-brand`) is intentionally not remapped.
+ */
+.dark {
+  color-scheme: dark;
+
+  --color-brand-text: #6ee7b7;
+  --color-brand-soft: #06261d;
+
+  --color-white: #121816;
+  --color-neutral-50: #0b0f0d;
+  --color-neutral-100: #151b18;
+  --color-neutral-200: #232b27;
+  --color-neutral-300: #34403a;
+  --color-neutral-400: #5c6862;
+  --color-neutral-500: #8a958f;
+  --color-neutral-600: #aab4ae;
+  --color-neutral-700: #c4ccc7;
+  --color-neutral-800: #dde3df;
+  --color-neutral-900: #f1f4f2;
+
+  --color-emerald-50: #06261d;
+  --color-emerald-200: #14503a;
+  --color-emerald-900: #d1fae5;
+  --color-emerald-950: #ecfdf5;
+
+  --color-amber-50: #2a2008;
+  --color-amber-200: #6b4f12;
+  --color-amber-900: #fde68a;
+
+  --color-red-50: #2a0f0f;
+  --color-red-200: #7f2a2a;
+  --color-red-800: #fecaca;
 }
 
 html {
@@ -14,6 +56,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-brand-text);
   outline-offset: 2px;
 }

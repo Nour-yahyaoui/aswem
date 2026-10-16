@@ -68,7 +68,7 @@ export function SearchBox({
         />
         <button
           type="submit"
-          className="h-12 rounded-xl bg-brand px-5 text-base font-semibold text-white shadow-sm hover:bg-emerald-800"
+          className="h-12 rounded-xl bg-brand px-5 text-base font-semibold text-on-brand shadow-sm hover:bg-emerald-800"
         >
           {dict.search.button}
         </button>

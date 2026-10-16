@@ -74,7 +74,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           <p className="mt-1 text-sm text-neutral-600">{dict.search.notFoundText}</p>
           <Link
             href={`/${locale}/submit`}
-            className="mt-4 inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white"
+            className="mt-4 inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-on-brand"
           >
             {dict.search.addPrice}
           </Link>

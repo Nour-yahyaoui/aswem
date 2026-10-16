@@ -110,6 +110,11 @@ const ar = {
       generic: "صارت مشكلة، عاود جرب بعد شوية.",
     },
   },
+  theme: {
+    label: "تبديل المظهر",
+    dark: "الوضع الليلي",
+    light: "الوضع النهاري",
+  },
   footer: {
     free: "{name} مجاني 100%، ومفتوح المصدر. الأسعار تزيدها الجماعة، وهي تقريبية.",
     builtBy: "صنع بواسطة",
@@ -257,6 +262,11 @@ const fr: Dict = {
       badRequest: "Les informations ne sont pas valides, ou le prix est très éloigné de la moyenne. Vérifiez et réessayez.",
       generic: "Un problème est survenu, réessayez plus tard.",
     },
+  },
+  theme: {
+    label: "Changer le thème",
+    dark: "Mode sombre",
+    light: "Mode clair",
   },
   footer: {
     free: "{name} est gratuit et open source. Les prix sont partagés par la communauté et sont donnés à titre indicatif.",

@@ -165,7 +165,7 @@ export function SubmitForm({
           type="button"
           onClick={useMyPosition}
           disabled={locating}
-          className="inline-flex h-10 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:border-brand hover:text-brand disabled:opacity-60"
+          className="inline-flex h-10 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:border-brand hover:text-brand-text disabled:opacity-60"
         >
           {locating ? dict.locating : dict.useMyPosition}
         </button>
@@ -200,7 +200,7 @@ export function SubmitForm({
       <button
         type="submit"
         disabled={pending}
-        className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-base font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:opacity-60"
+        className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-base font-semibold text-on-brand shadow-sm hover:bg-emerald-800 disabled:opacity-60"
       >
         {pending ? dict.submitting : dict.submit}
       </button>

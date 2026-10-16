@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { dirOf, LOCALES, t } from "@/lib/i18n";
 import { parseLocale } from "@/lib/locale";
 import { SITE } from "@/lib/site";
+import { THEME_SCRIPT } from "@/lib/theme";
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -55,9 +56,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export const viewport: Viewport = {
-  themeColor: "#047857",
   width: "device-width",
   initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#047857" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f0d" },
+  ],
 };
 
 export default async function LocaleLayout({
@@ -68,7 +72,11 @@ export default async function LocaleLayout({
   const dict = t(locale);
 
   return (
-    <html lang={dict.htmlLang} dir={dirOf(locale)}>
+    <html lang={dict.htmlLang} dir={dirOf(locale)} suppressHydrationWarning>
+      <head>
+        {/* Applies the saved theme before paint, so there is no flash of the wrong colours. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="flex min-h-dvh flex-col bg-neutral-50 text-neutral-900 antialiased">
         <SiteHeader locale={locale} />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5">{children}</main>

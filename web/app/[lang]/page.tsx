@@ -45,7 +45,7 @@ export default async function HomePage({ params }: Props) {
             <Link
               key={c}
               href={`/${locale}/search?category=${encodeURIComponent(c)}`}
-              className="shrink-0 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-sm hover:border-brand hover:text-brand"
+              className="shrink-0 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-sm hover:border-brand hover:text-brand-text"
             >
               {categoryLabel(c, locale)}
             </Link>
@@ -58,7 +58,7 @@ export default async function HomePage({ params }: Props) {
           <h2 id="popular" className="text-lg font-semibold">
             {dict.home.products}
           </h2>
-          <Link href={`/${locale}/search`} className="text-sm text-brand hover:underline">
+          <Link href={`/${locale}/search`} className="text-sm text-brand-text hover:underline">
             {dict.home.seeAll}
           </Link>
         </div>
@@ -78,7 +78,7 @@ export default async function HomePage({ params }: Props) {
         <p className="mb-3">{dict.home.newPriceText}</p>
         <Link
           href={`/${locale}/submit`}
-          className="inline-flex h-10 items-center rounded-lg bg-brand px-4 font-semibold text-white hover:bg-emerald-800"
+          className="inline-flex h-10 items-center rounded-lg bg-brand px-4 font-semibold text-on-brand hover:bg-emerald-800"
         >
           {dict.home.addPrice}
         </Link>

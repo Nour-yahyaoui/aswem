@@ -16,12 +16,12 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             href={SITE.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand underline-offset-4 hover:underline"
+            className="text-brand-text underline-offset-4 hover:underline"
             dir="ltr"
           >
             GitHub: Nour-yahyaoui
           </a>
-          <a href={`tel:${SITE.phoneTel}`} className="text-brand underline-offset-4 hover:underline" dir="ltr">
+          <a href={`tel:${SITE.phoneTel}`} className="text-brand-text underline-offset-4 hover:underline" dir="ltr">
             {SITE.phoneDisplay}
           </a>
         </p>
