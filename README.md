@@ -2,7 +2,7 @@
 
 Free, open-source community prices for Tunisia. People report what they pay for everyday products in each governorate, and Aswem shows medians, lows, and recent reports.
 
-- **Web:** Next.js (App Router, Server Components, Server Actions), deployed on Vercel. Target URL: `aswem.vercel.app`, later `aswem.tn`.
+- **Web:** Next.js (App Router, Server Components, Server Actions), deployed on Vercel. Two languages: Tunisian Darija at `/ar` and French at `/fr`. Target URL: `aswem.vercel.app`, later `aswem.tn`.
 - **API:** Actix Web (Rust) with SQLx, deployed on Render. Target URL: `aswem.onrender.app`.
 - **Database:** Neon (serverless Postgres) with `pg_trgm` for fuzzy search.
 

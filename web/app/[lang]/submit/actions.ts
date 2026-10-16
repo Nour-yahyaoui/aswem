@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { DEFAULT_LOCALE, isLocale, t, type Locale } from "@/lib/i18n";
 
 export type SubmitState =
   | { status: "idle" }
@@ -12,45 +13,44 @@ const MIN_MILLIMES = 100;
 const MAX_MILLIMES = 10_000_000;
 const MAX_ADDRESS = 120;
 
-const fail = (message: string): SubmitState => ({ status: "error", message });
-
 /**
  * Validates a community price report and forwards it to the API.
  * Runs only on the server, so the API token never reaches the browser.
  */
 export async function submitPrice(_prev: SubmitState, formData: FormData): Promise<SubmitState> {
+  const langValue = String(formData.get("lang") ?? "");
+  const locale: Locale = isLocale(langValue) ? langValue : DEFAULT_LOCALE;
+  const e = t(locale).submit.errors;
+  const fail = (message: string): SubmitState => ({ status: "error", message });
+
   // Honeypot: real users never fill this hidden field.
-  if (String(formData.get("website") ?? "") !== "") {
-    return fail("تعذر إرسال الثمن، عاود جرب.");
-  }
+  if (String(formData.get("website") ?? "") !== "") return fail(e.honeypot);
 
   const productId = Number(formData.get("product_id"));
   const governorateId = Number(formData.get("governorate_id"));
   const productSlug = String(formData.get("product_slug") ?? "");
-  if (!Number.isInteger(productId) || productId <= 0) return fail("اختار المادة.");
-  if (!Number.isInteger(governorateId) || governorateId <= 0) return fail("اختار الولاية.");
+  if (!Number.isInteger(productId) || productId <= 0) return fail(e.product);
+  if (!Number.isInteger(governorateId) || governorateId <= 0) return fail(e.governorate);
 
   const priceText = String(formData.get("price") ?? "").trim().replace(",", ".");
   const price = Number(priceText);
-  if (priceText === "" || !Number.isFinite(price) || price <= 0) return fail("الثمن ما هوش صحيح.");
+  if (priceText === "" || !Number.isFinite(price) || price <= 0) return fail(e.priceInvalid);
   const millimes = Math.round(price * 1000);
-  if (millimes < MIN_MILLIMES || millimes > MAX_MILLIMES) {
-    return fail("الثمن برا المجال المسموح (من 0.100 إلى 10000 د.ت).");
-  }
+  if (millimes < MIN_MILLIMES || millimes > MAX_MILLIMES) return fail(e.priceRange);
 
   const address = String(formData.get("address") ?? "").trim();
-  if (address.length > MAX_ADDRESS) return fail("اسم المحل أو المنطقة طويل بزاف.");
+  if (address.length > MAX_ADDRESS) return fail(e.placeTooLong);
 
   const latText = String(formData.get("lat") ?? "");
   const lngText = String(formData.get("lng") ?? "");
   const lat = latText === "" ? null : Number(latText);
   const lng = lngText === "" ? null : Number(lngText);
-  if ((lat === null) !== (lng === null)) return fail("الموقع ناقص، عاود جرب.");
-  if (!address && lat === null) return fail("زيد اسم المحل أو المنطقة، ولا استعمل موقعك.");
+  if ((lat === null) !== (lng === null)) return fail(e.locationPartial);
+  if (!address && lat === null) return fail(e.placeOrLocation);
 
   const apiUrl = process.env.API_URL;
   const token = process.env.SUBMIT_TOKEN;
-  if (!apiUrl || !token) return fail("الخدمة مش متوفرة توّا.");
+  if (!apiUrl || !token) return fail(e.unavailable);
 
   const h = await headers();
   const clientIp = (h.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
@@ -75,14 +75,14 @@ export async function submitPrice(_prev: SubmitState, formData: FormData): Promi
       cache: "no-store",
     });
   } catch {
-    return fail("الخدمة مش متوفرة توّا، عاود جرب بعد شوية.");
+    return fail(e.network);
   }
 
   if (res.status === 201) {
-    if (productSlug) revalidatePath(`/products/${productSlug}`);
+    if (productSlug) revalidatePath(`/${locale}/products/${productSlug}`);
     return { status: "ok", productSlug };
   }
-  if (res.status === 429) return fail("بزاف تصاريح من الجهاز هذا، استنى شوية.");
-  if (res.status === 400) return fail("المعلومات ماشي صحيحة، أو الثمن بعيد على المعدل. تأكد منها وعاود جرب.");
-  return fail("صارت مشكلة، عاود جرب بعد شوية.");
+  if (res.status === 429) return fail(e.rateLimited);
+  if (res.status === 400) return fail(e.badRequest);
+  return fail(e.generic);
 }

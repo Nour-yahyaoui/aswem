@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { submitPrice, type SubmitState } from "@/app/submit/actions";
+import { submitPrice, type SubmitState } from "@/app/[lang]/submit/actions";
+import { fill, governorateName, productName, t, type Locale } from "@/lib/i18n";
 import { nearestGovernorate } from "@/lib/geo";
 import type { Governorate, Product } from "@/lib/types";
-import Link from "next/link";
 
 const initial: SubmitState = { status: "idle" };
 
@@ -12,14 +13,17 @@ const fieldClass =
   "h-12 w-full rounded-xl border border-neutral-300 bg-white px-4 text-base focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20";
 
 export function SubmitForm({
+  locale,
   products,
   governorates,
   defaultProductId,
 }: {
+  locale: Locale;
   products: Product[];
   governorates: Governorate[];
   defaultProductId?: number;
 }) {
+  const dict = t(locale).submit;
   const [state, action, pending] = useActionState(submitPrice, initial);
   const [productId, setProductId] = useState(defaultProductId ? String(defaultProductId) : "");
   const [governorateId, setGovernorateId] = useState("");
@@ -41,7 +45,7 @@ export function SubmitForm({
 
   function useMyPosition() {
     if (!navigator.geolocation) {
-      setGeoMessage("المتصفح ما يعطيش الموقع. اختار الولاية يدوياً.");
+      setGeoMessage(dict.geoUnsupported);
       return;
     }
     setLocating(true);
@@ -52,12 +56,16 @@ export function SubmitForm({
         // Keep three decimals (about 110 m), the same precision the API stores.
         setLat(latitude.toFixed(3));
         setLng(longitude.toFixed(3));
-        if (nearest) setGovernorateId(String(nearest.id));
-        setGeoMessage(nearest ? `تم اختيار ولاية ${nearest.name_ar} من موقعك. تقدر تبدلها.` : null);
+        if (nearest) {
+          setGovernorateId(String(nearest.id));
+          setGeoMessage(fill(dict.geoPicked, { gov: governorateName(nearest, locale) }));
+        } else {
+          setGeoMessage(null);
+        }
         setLocating(false);
       },
       () => {
-        setGeoMessage("ما تنجمش نحدد موقعك. اختار الولاية يدوياً.");
+        setGeoMessage(dict.geoDenied);
         setLocating(false);
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
@@ -66,12 +74,17 @@ export function SubmitForm({
 
   return (
     <form ref={formRef} action={action} className="space-y-5" noValidate>
+      <input type="hidden" name="lang" value={locale} />
+
       {state.status === "ok" && (
         <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
-          <p className="font-semibold">شكراً! الثمن تسجل.</p>
+          <p className="font-semibold">{dict.successTitle}</p>
           {state.productSlug && (
-            <Link href={`/products/${state.productSlug}`} className="mt-1 inline-block text-sm underline underline-offset-4">
-              شوف الأسعار الجديدة
+            <Link
+              href={`/${locale}/products/${state.productSlug}`}
+              className="mt-1 inline-block text-sm underline underline-offset-4"
+            >
+              {dict.successLink}
             </Link>
           )}
         </div>
@@ -83,7 +96,9 @@ export function SubmitForm({
       )}
 
       <div className="space-y-2">
-        <label htmlFor="product_id" className="block text-sm font-semibold">المادة</label>
+        <label htmlFor="product_id" className="block text-sm font-semibold">
+          {dict.product}
+        </label>
         <select
           id="product_id"
           name="product_id"
@@ -92,32 +107,42 @@ export function SubmitForm({
           onChange={(e) => setProductId(e.target.value)}
           className={fieldClass}
         >
-          <option value="" disabled>اختار المادة</option>
+          <option value="" disabled>
+            {dict.chooseProduct}
+          </option>
           {products.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name_ar} ({p.name_latin})
+              {productName(p, locale)} ({locale === "ar" ? p.name_latin : p.name_ar})
             </option>
           ))}
         </select>
-        <input type="hidden" name="product_slug" value={products.find((p) => String(p.id) === productId)?.slug ?? ""} />
+        <input
+          type="hidden"
+          name="product_slug"
+          value={products.find((p) => String(p.id) === productId)?.slug ?? ""}
+        />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="price" className="block text-sm font-semibold">الثمن بالدينار</label>
+        <label htmlFor="price" className="block text-sm font-semibold">
+          {dict.price}
+        </label>
         <input
           id="price"
           name="price"
           inputMode="decimal"
           autoComplete="off"
-          placeholder="مثلاً 3.500"
+          placeholder={dict.pricePlaceholder}
           required
           className={fieldClass}
         />
-        <p className="text-xs text-neutral-500">كتبه بالدينار، مثلاً 3.500 أو 3,5</p>
+        <p className="text-xs text-neutral-500">{dict.priceHint}</p>
       </div>
 
       <div className="space-y-2">
-        <span className="block text-sm font-semibold">الولاية</span>
+        <label htmlFor="governorate_id" className="block text-sm font-semibold">
+          {dict.governorate}
+        </label>
         <select
           id="governorate_id"
           name="governorate_id"
@@ -127,10 +152,12 @@ export function SubmitForm({
           className={fieldClass}
           aria-describedby="geo-help"
         >
-          <option value="" disabled>اختار الولاية</option>
+          <option value="" disabled>
+            {dict.chooseGovernorate}
+          </option>
           {governorates.map((g) => (
             <option key={g.id} value={g.id}>
-              {g.name_ar} ({g.name_latin})
+              {governorateName(g, locale)}
             </option>
           ))}
         </select>
@@ -140,10 +167,10 @@ export function SubmitForm({
           disabled={locating}
           className="inline-flex h-10 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:border-brand hover:text-brand disabled:opacity-60"
         >
-          {locating ? "نحدد موقعك…" : "استعمل موقعي"}
+          {locating ? dict.locating : dict.useMyPosition}
         </button>
         <p id="geo-help" className="text-xs text-neutral-500" aria-live="polite">
-          {geoMessage ?? "موقعك ما يتسجلش بالدقة، نحفظو تقريبي برك."}
+          {geoMessage ?? dict.geoIdle}
         </p>
         <input type="hidden" name="lat" value={lat} />
         <input type="hidden" name="lng" value={lng} />
@@ -151,17 +178,17 @@ export function SubmitForm({
 
       <div className="space-y-2">
         <label htmlFor="address" className="block text-sm font-semibold">
-          المحل أو المنطقة <span className="font-normal text-neutral-500">(اختياري إذا استعملت موقعك)</span>
+          {dict.place} <span className="font-normal text-neutral-500">{dict.placeOptional}</span>
         </label>
         <input
           id="address"
           name="address"
           maxLength={120}
-          placeholder="مثلاً: سوبرماركت، حي النصر"
+          placeholder={dict.placePlaceholder}
           autoComplete="off"
           className={fieldClass}
         />
-        <p className="text-xs text-neutral-500">اكتب اسم المحل أو المنطقة فقط. لا تكتب عنوان دارك.</p>
+        <p className="text-xs text-neutral-500">{dict.placeHint}</p>
       </div>
 
       {/* Honeypot: hidden from people, often filled by bots. */}
@@ -175,9 +202,9 @@ export function SubmitForm({
         disabled={pending}
         className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-base font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:opacity-60"
       >
-        {pending ? "نسجلو…" : "إرسال الثمن"}
+        {pending ? dict.submitting : dict.submit}
       </button>
-      <p className="text-center text-xs text-neutral-500">مجاني، بلا تسجيل. ما نحفظوش صورك ولا بياناتك الشخصية.</p>
+      <p className="text-center text-xs text-neutral-500">{dict.privacy}</p>
     </form>
   );
 }

@@ -2,10 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
+import { productName, t, type Locale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
-/** Search input with live suggestions. Submitting the form opens the full results page. */
-export function SearchBox({ defaultValue = "", autoFocus = false }: { defaultValue?: string; autoFocus?: boolean }) {
+/** Search input with live suggestions. Submitting opens the full results page. */
+export function SearchBox({
+  locale,
+  defaultValue = "",
+  autoFocus = false,
+}: {
+  locale: Locale;
+  defaultValue?: string;
+  autoFocus?: boolean;
+}) {
+  const dict = t(locale);
   const [value, setValue] = useState(defaultValue);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
@@ -35,7 +45,7 @@ export function SearchBox({ defaultValue = "", autoFocus = false }: { defaultVal
 
   return (
     <div className="relative">
-      <form action="/search" method="get" role="search" className="flex gap-2">
+      <form action={`/${locale}/search`} method="get" role="search" className="flex gap-2">
         <input
           type="search"
           name="q"
@@ -46,8 +56,8 @@ export function SearchBox({ defaultValue = "", autoFocus = false }: { defaultVal
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="اكتب المادة: حليب، زيت، سكر…"
-          aria-label="بحث عن مادة"
+          placeholder={dict.search.placeholder}
+          aria-label={dict.search.label}
           aria-controls={listId}
           aria-autocomplete="list"
           autoComplete="off"
@@ -60,7 +70,7 @@ export function SearchBox({ defaultValue = "", autoFocus = false }: { defaultVal
           type="submit"
           className="h-12 rounded-xl bg-brand px-5 text-base font-semibold text-white shadow-sm hover:bg-emerald-800"
         >
-          بحث
+          {dict.search.button}
         </button>
       </form>
 
@@ -72,10 +82,13 @@ export function SearchBox({ defaultValue = "", autoFocus = false }: { defaultVal
         >
           {suggestions.map((p) => (
             <li key={p.id} role="option" aria-selected="false">
-              <Link href={`/products/${p.slug}`} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-brand-soft">
-                <span className="font-medium">{p.name_ar}</span>
+              <Link
+                href={`/${locale}/products/${p.slug}`}
+                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-brand-soft"
+              >
+                <span className="font-medium">{productName(p, locale)}</span>
                 <span className="text-xs text-neutral-500" dir="ltr">
-                  {p.name_latin}
+                  {locale === "ar" ? p.name_latin : p.name_ar}
                 </span>
               </Link>
             </li>
