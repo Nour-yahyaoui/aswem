@@ -1,0 +1,21 @@
+# Render Blueprint for the Aswem API.
+# The Next.js frontend is deployed separately on Vercel (root directory: web).
+services:
+  - type: web
+    name: aswem-api
+    runtime: docker
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    region: frankfurt
+    plan: starter
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: RUST_LOG
+        value: info
+      - key: SUBMIT_PER_HOUR
+        value: "10"
+      - key: DATABASE_URL
+        sync: false # Neon pooled connection string, with sslmode=require
+      - key: SUBMIT_TOKEN
+        sync: false # 32+ random characters, must match SUBMIT_TOKEN on Vercel

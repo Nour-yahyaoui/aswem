@@ -1,0 +1,17 @@
+# Dependencies and build output
+node_modules/
+web/.next/
+web/out/
+api/target/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
