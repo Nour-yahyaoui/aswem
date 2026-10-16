@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.85-slim-bookworm AS build
+FROM rust:1.90-slim-bookworm AS build
 WORKDIR /app
 RUN apt-get update \
  && apt-get install -y --no-install-recommends pkg-config ca-certificates \

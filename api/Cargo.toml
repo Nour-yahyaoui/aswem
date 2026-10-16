@@ -2,7 +2,7 @@
 name = "aswem-api"
 version = "1.0.0"
 edition = "2021"
-rust-version = "1.85"
+rust-version = "1.90"
 license = "MIT"
 description = "Aswem API: open, community-driven price reports for Tunisia"
 repository = "https://github.com/Nour-yahyaoui/riseoftheconqueror"

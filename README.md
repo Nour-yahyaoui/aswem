@@ -48,7 +48,7 @@ Generate a token with `openssl rand -base64 48`.
 
 ## Local development
 
-Requires Node 20.9+, Rust 1.85+, and a Postgres database (a free Neon project works).
+Requires Node 20.9+, Rust 1.90+, and a Postgres database (a free Neon project works).
 
 ```bash
 # API
