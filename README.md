@@ -1,4 +1,4 @@
-# Aswem · أسعم
+# Aswem · أسوام
 
 Free, open-source community prices for Tunisia. People report what they pay for everyday products in each governorate, and Aswem shows medians, lows, and recent reports.
 
