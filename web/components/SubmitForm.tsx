@@ -73,7 +73,7 @@ export function SubmitForm({
   }
 
   return (
-    <form ref={formRef} action={action} className="space-y-5" noValidate>
+    <form ref={formRef} action={action} className="space-y-5">
       <input type="hidden" name="lang" value={locale} />
 
       {state.status === "ok" && (

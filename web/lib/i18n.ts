@@ -13,6 +13,13 @@ export function isLocale(value: string): value is Locale {
 
 const ar = {
   languageName: "Français",
+  skipToContent: "تخطى للمحتوى",
+  error: {
+    title: "صارت مشكلة في الصفحة",
+    text: "عاود جرب. إذا المشكل يعاود، قلنا في GitHub.",
+    retry: "عاود جرب",
+    home: "الرئيسية",
+  },
   brand: "أسوام",
   brandLatin: "Aswem",
   tagline: "شوف الأسعار في كل ولاية في تونس، وزيد الثمن اللي شفتو بالمجان.",
@@ -206,6 +213,13 @@ export type Dict = typeof ar;
 
 const fr: Dict = {
   languageName: "العربية",
+  skipToContent: "Aller au contenu",
+  error: {
+    title: "Un problème est survenu sur cette page",
+    text: "Réessayez. Si le problème persiste, signalez-le sur GitHub.",
+    retry: "Réessayer",
+    home: "Accueil",
+  },
   brand: "أسوام",
   brandLatin: "Aswem",
   tagline: "Comparez les prix dans chaque gouvernorat de Tunisie, et partagez le prix que vous voyez, gratuitement.",

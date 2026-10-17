@@ -70,6 +70,33 @@ npm run dev
 - **API:** create a Render Web Service from this repo (or apply `render.yaml`). Health check: `/healthz`.
 - **Web:** create a Vercel project with **Root Directory** set to `web`. Add the web variables above.
 
+## Tests and checks
+
+```bash
+# API (Rust 1.90+)
+cd api
+cargo fmt --check
+cargo clippy --all-targets --locked -- -D warnings
+cargo test --locked
+cargo audit
+
+# Web (Node 20.9+)
+cd web
+npm run typecheck
+npm run lint
+npm test                          # Vitest: formatting, geo, client IP, API fallback, translations
+npm run build                     # needs API_URL and SUBMIT_TOKEN; the API may be unreachable
+npm audit --omit=dev
+```
+
+CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request.
+
+## Architecture
+
+- **Web (`web/`):** Next.js App Router on Vercel. Every public page lives under `app/[lang]/` (`ar` default, `fr`). `middleware.ts` redirects `/` by `Accept-Language`. Pages are statically cached for 5 minutes and fall back to an empty state if the API is down. Security headers and the CSP are in `next.config.ts`.
+- **API (`api/`):** Actix Web on Render. Postgres via sqlx with static SQL only. Migrations run at startup. Writes (prices, reports) need `X-Aswem-Token` and are rate limited per client IP. Admin routes exist only when `ADMIN_TOKEN` is set. Rate limits are in memory, so they are per instance.
+- **Database (Neon):** governorates and products are reference data (seeded). Prices and reports are user data. Prices are stored as integer millimes. Positions are rounded to 3 decimals.
+
 ## Moderation
 
 Problem reports (expired, spoiled, wrong label) are hidden until a moderator approves them. With `ADMIN_TOKEN` set, moderators can:
@@ -82,6 +109,15 @@ curl -H "X-Admin-Token: $ADMIN_TOKEN" "https://aswem.onrender.com/api/v1/admin/r
 curl -X POST -H "X-Admin-Token: $ADMIN_TOKEN" -H "Content-Type: application/json" \
   -d '{"decision":"approved"}' "https://aswem.onrender.com/api/v1/admin/reports/42"
 ```
+
+## Production checklist
+
+- [ ] **Render:** set `ADMIN_TOKEN` (generate with `openssl rand -base64 48`), then redeploy. Confirm `https://aswem.onrender.com/healthz` returns OK.
+- [ ] **Render:** `DATABASE_URL` must not contain `channel_binding=require`. Neon's pooled URL is fine without it.
+- [ ] **Vercel (Production):** set `API_URL=https://aswem.onrender.com` and `SUBMIT_TOKEN` (same value as Render), then redeploy.
+- [ ] **Domain:** when `aswem.tn` is live, update `NEXT_PUBLIC_SITE_URL` (sitemap, canonical links, OpenGraph) and submit the sitemap in Google Search Console.
+- [ ] **Monitoring:** check `cargo audit` and `npm audit` results in CI each week. Review pending reports regularly.
+- [ ] **Backups:** confirm Neon point-in-time restore is enabled for the project.
 
 ## Data and privacy
 

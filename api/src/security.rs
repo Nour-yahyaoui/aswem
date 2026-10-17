@@ -28,3 +28,24 @@ pub fn client_ip(req: &HttpRequest) -> String {
         .filter(|v| !v.is_empty())
         .unwrap_or_else(|| "unknown".to_string())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::constant_time_eq;
+
+    #[test]
+    fn equal_tokens_match() {
+        assert!(constant_time_eq(b"secret-token", b"secret-token"));
+    }
+
+    #[test]
+    fn different_tokens_do_not_match() {
+        assert!(!constant_time_eq(b"secret-token", b"secret-tokeX"));
+    }
+
+    #[test]
+    fn different_lengths_do_not_match() {
+        assert!(!constant_time_eq(b"abc", b"abcd"));
+        assert!(!constant_time_eq(b"", b"x"));
+    }
+}

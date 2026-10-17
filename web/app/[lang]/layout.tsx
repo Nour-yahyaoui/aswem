@@ -78,8 +78,20 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="flex min-h-dvh flex-col bg-neutral-50 text-neutral-900 antialiased">
+        <a
+          href="#main"
+          className="sr-only z-50 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-on-brand focus:not-sr-only focus:fixed focus:start-4 focus:top-4"
+        >
+          {dict.skipToContent}
+        </a>
         <SiteHeader locale={locale} />
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5 sm:px-6 md:max-w-5xl md:pb-10 md:pt-8">{children}</main>
+        <main
+          id="main"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5 outline-none sm:px-6 md:max-w-5xl md:pb-10 md:pt-8"
+        >
+          {children}
+        </main>
         <SiteFooter locale={locale} />
         <BottomNav locale={locale} />
       </body>

@@ -95,3 +95,20 @@ fn escape_like(input: &str) -> String {
     }
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::escape_like;
+
+    #[test]
+    fn escapes_like_wildcards() {
+        assert_eq!(escape_like("100%"), "100\\%");
+        assert_eq!(escape_like("a_b"), "a\\_b");
+        assert_eq!(escape_like("c:\\x"), "c:\\\\x");
+    }
+
+    #[test]
+    fn leaves_plain_text_alone() {
+        assert_eq!(escape_like("حليب 1 لتر"), "حليب 1 لتر");
+    }
+}

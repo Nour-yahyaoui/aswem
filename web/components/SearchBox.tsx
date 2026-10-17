@@ -55,7 +55,7 @@ export function SearchBox({
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          onBlur={() => setOpen(false)}
           placeholder={dict.search.placeholder}
           aria-label={dict.search.label}
           aria-controls={listId}
@@ -78,10 +78,11 @@ export function SearchBox({
         <ul
           id={listId}
           role="listbox"
+          onMouseDown={(e) => e.preventDefault()}
           className="absolute inset-x-0 top-14 z-20 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg"
         >
           {suggestions.map((p) => (
-            <li key={p.id} role="option" aria-selected="false">
+            <li key={p.id} role="presentation">
               <Link
                 href={`/${locale}/products/${p.slug}`}
                 className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-brand-soft"

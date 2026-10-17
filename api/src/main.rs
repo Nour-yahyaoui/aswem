@@ -6,11 +6,26 @@ mod ratelimit;
 mod routes;
 mod security;
 
-use actix_web::{middleware::DefaultHeaders, middleware::Logger, web, App, HttpServer};
+use actix_web::{
+    error::{InternalError, JsonPayloadError},
+    middleware::{DefaultHeaders, Logger},
+    web, App, HttpRequest, HttpResponse, HttpServer,
+};
 use sqlx::PgPool;
 use tracing_subscriber::EnvFilter;
 
 use crate::{config::Config, ratelimit::Limiter};
+
+/// JSON body limits. Malformed or oversized bodies get the same JSON error format as the rest of the API.
+fn json_config() -> web::JsonConfig {
+    web::JsonConfig::default()
+        .limit(16 * 1024)
+        .error_handler(|err: JsonPayloadError, _req: &HttpRequest| {
+            let response = HttpResponse::BadRequest()
+                .json(serde_json::json!({ "error": "invalid request body" }));
+            InternalError::from_response(err, response).into()
+        })
+}
 
 /// Shared state available to every handler.
 pub struct AppState {
@@ -28,14 +43,10 @@ async fn main() -> std::io::Result<()> {
         .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
         .init();
 
-    let cfg = Config::from_env().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
+    let cfg = Config::from_env().map_err(std::io::Error::other)?;
 
-    let pool = db::connect(&cfg.database_url)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
-    db::migrate(&pool)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let pool = db::connect(&cfg.database_url).await.map_err(std::io::Error::other)?;
+    db::migrate(&pool).await.map_err(std::io::Error::other)?;
 
     let state = web::Data::new(AppState {
         pool,
@@ -50,7 +61,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(state.clone())
-            .app_data(web::JsonConfig::default().limit(16 * 1024))
+            .app_data(json_config())
             .wrap(Logger::default())
             .wrap(
                 DefaultHeaders::new()

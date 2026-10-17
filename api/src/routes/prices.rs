@@ -173,3 +173,65 @@ fn round3(value: f64) -> f64 {
     (value * 1000.0).round() / 1000.0
 }
 
+#[cfg(test)]
+mod tests {
+    use super::validate;
+    use crate::models::PriceSubmission;
+
+    fn base() -> PriceSubmission {
+        PriceSubmission {
+            product_id: 1,
+            governorate_id: 13,
+            price_millimes: 3500,
+            address: Some("  Carrefour Monastir  ".to_string()),
+            lat: None,
+            lng: None,
+        }
+    }
+
+    #[test]
+    fn accepts_and_trims_a_place_name() {
+        let ok = validate(base()).expect("valid submission");
+        assert_eq!(ok.address.as_deref(), Some("Carrefour Monastir"));
+    }
+
+    #[test]
+    fn rejects_out_of_range_prices() {
+        let mut low = base();
+        low.price_millimes = 99;
+        assert!(validate(low).is_err());
+
+        let mut high = base();
+        high.price_millimes = 10_000_001;
+        assert!(validate(high).is_err());
+    }
+
+    #[test]
+    fn requires_a_place_or_a_position() {
+        let mut none = base();
+        none.address = Some("   ".to_string());
+        assert!(validate(none).is_err());
+    }
+
+    #[test]
+    fn rejects_half_a_position() {
+        let mut half = base();
+        half.lat = Some(35.8);
+        assert!(validate(half).is_err());
+    }
+
+    #[test]
+    fn rounds_positions_and_rejects_points_outside_tunisia() {
+        let mut inside = base();
+        inside.lat = Some(35.78123);
+        inside.lng = Some(10.83456);
+        let ok = validate(inside).expect("inside Tunisia");
+        assert_eq!(ok.lat, Some(35.781));
+        assert_eq!(ok.lng, Some(10.835));
+
+        let mut outside = base();
+        outside.lat = Some(48.85);
+        outside.lng = Some(2.35);
+        assert!(validate(outside).is_err());
+    }
+}
