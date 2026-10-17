@@ -34,6 +34,7 @@ render.yaml   Render Blueprint for the API
 | `SUBMIT_TOKEN` | yes | Any non-empty secret. Must equal the web value |
 | `PORT` | no | Set by Render automatically |
 | `SUBMIT_PER_HOUR` | no | Default `10` submissions per client per hour |
+| `ADMIN_TOKEN` | no | Enables the moderation endpoints under `/api/v1/admin`. Leave unset to disable them |
 | `RUST_LOG` | no | Default `info` |
 
 **Web (Vercel)**
@@ -68,6 +69,19 @@ npm run dev
 - **Database:** create a Neon project. Use the pooled connection string for `DATABASE_URL`. Migrations run automatically when the API starts.
 - **API:** create a Render Web Service from this repo (or apply `render.yaml`). Health check: `/healthz`.
 - **Web:** create a Vercel project with **Root Directory** set to `web`. Add the web variables above.
+
+## Moderation
+
+Problem reports (expired, spoiled, wrong label) are hidden until a moderator approves them. With `ADMIN_TOKEN` set, moderators can:
+
+```bash
+# list pending reports
+curl -H "X-Admin-Token: $ADMIN_TOKEN" "https://aswem.onrender.com/api/v1/admin/reports?status=pending"
+
+# approve or reject report 42
+curl -X POST -H "X-Admin-Token: $ADMIN_TOKEN" -H "Content-Type: application/json" \
+  -d '{"decision":"approved"}' "https://aswem.onrender.com/api/v1/admin/reports/42"
+```
 
 ## Data and privacy
 

@@ -37,3 +37,9 @@ export type ProductPrices = {
   by_governorate: GovStat[];
   recent: PriceReport[];
 };
+
+export type PublicReport = {
+  governorate_id: number;
+  reason: string;
+  created_at: string;
+};

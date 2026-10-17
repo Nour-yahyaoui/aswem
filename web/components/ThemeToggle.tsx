@@ -31,7 +31,7 @@ export function ThemeToggle({ locale }: { locale: Locale }) {
       aria-label={dark ? dict.light : dict.dark}
       title={dark ? dict.light : dict.dark}
       aria-pressed={dark}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand-text"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand-text"
     >
       <svg
         width="16"

@@ -3,6 +3,7 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use crate::{
     error::ApiError,
     models::{GovStat, PriceSubmission, PriceView},
+    security::{client_ip, token_matches},
     AppState,
 };
 
@@ -76,22 +77,10 @@ pub async fn submit(
     state: web::Data<AppState>,
     body: web::Json<PriceSubmission>,
 ) -> Result<HttpResponse, ApiError> {
-    let token = req
-        .headers()
-        .get("x-aswem-token")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
-    if !constant_time_eq(token.as_bytes(), state.submit_token.as_bytes()) {
+    if !token_matches(&req, "x-aswem-token", &state.submit_token) {
         return Err(ApiError::Unauthorized);
     }
-
-    let client_ip = req
-        .headers()
-        .get("x-client-ip")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown")
-        .to_string();
-    if !state.limiter.check(&client_ip) {
+    if !state.limiter.check(&client_ip(&req)) {
         return Err(ApiError::TooManyRequests);
     }
 
@@ -184,9 +173,3 @@ fn round3(value: f64) -> f64 {
     (value * 1000.0).round() / 1000.0
 }
 
-fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
-    if a.len() != b.len() {
-        return false;
-    }
-    a.iter().zip(b).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
-}

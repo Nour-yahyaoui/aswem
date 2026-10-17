@@ -4,6 +4,7 @@ mod error;
 mod models;
 mod ratelimit;
 mod routes;
+mod security;
 
 use actix_web::{middleware::DefaultHeaders, middleware::Logger, web, App, HttpServer};
 use sqlx::PgPool;
@@ -15,7 +16,9 @@ use crate::{config::Config, ratelimit::Limiter};
 pub struct AppState {
     pub pool: PgPool,
     pub submit_token: String,
+    pub admin_token: Option<String>,
     pub limiter: Limiter,
+    pub report_limiter: Limiter,
 }
 
 #[actix_web::main]
@@ -37,7 +40,9 @@ async fn main() -> std::io::Result<()> {
     let state = web::Data::new(AppState {
         pool,
         submit_token: cfg.submit_token.clone(),
+        admin_token: cfg.admin_token.clone(),
         limiter: Limiter::new(cfg.submit_per_hour),
+        report_limiter: Limiter::new(cfg.submit_per_hour),
     });
 
     tracing::info!(port = cfg.port, "aswem api listening");

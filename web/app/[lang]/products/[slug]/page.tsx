@@ -9,7 +9,7 @@ import { parseLocale } from "@/lib/locale";
 import { jsonLd } from "@/lib/jsonld";
 import { pageAlternates } from "@/lib/seo";
 import { SITE } from "@/lib/site";
-import type { Governorate, GovStat, PriceReport, Product, ProductPrices } from "@/lib/types";
+import type { Governorate, GovStat, PriceReport, Product, ProductPrices, PublicReport } from "@/lib/types";
 
 export const revalidate = 120;
 
@@ -18,22 +18,27 @@ type Props = { params: Promise<{ lang: string; slug: string }> };
 type Loaded = {
   product: Product;
   prices: ProductPrices | null;
+  reports: PublicReport[];
   govs: Map<number, Governorate>;
 };
 
 async function load(slug: string): Promise<{ loaded: Loaded | null; failed: boolean }> {
-  const [productRes, pricesRes, govRes] = await Promise.all([
+  const [productRes, pricesRes, reportsRes, govRes] = await Promise.all([
     tryApiGet<Product>(`/products/${encodeURIComponent(slug)}`, 300),
     tryApiGet<ProductPrices>(`/products/${encodeURIComponent(slug)}/prices`, 120),
+    tryApiGet<PublicReport[]>(`/products/${encodeURIComponent(slug)}/reports`, 120),
     tryApiGet<Governorate[]>("/governorates", 86400),
   ]);
-  if (productRes.failed || pricesRes.failed || govRes.failed) return { loaded: null, failed: true };
+  if (productRes.failed || pricesRes.failed || reportsRes.failed || govRes.failed) {
+    return { loaded: null, failed: true };
+  }
   if (!productRes.data) return { loaded: null, failed: false };
   return {
     failed: false,
     loaded: {
       product: productRes.data,
       prices: pricesRes.data,
+      reports: reportsRes.data ?? [],
       govs: new Map((govRes.data ?? []).map((g) => [g.id, g])),
     },
   };
@@ -91,7 +96,7 @@ export default async function ProductPage({ params }: Props) {
   if (failed) return <Unavailable locale={locale} />;
   if (!loaded) notFound();
 
-  const { product, prices, govs } = loaded;
+  const { product, prices, reports, govs } = loaded;
   const name = productName(product, locale);
   const category = categoryLabel(product.category, locale);
   const stats = prices?.by_governorate ?? [];
@@ -153,7 +158,7 @@ export default async function ProductPage({ params }: Props) {
       </nav>
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold">{name}</h1>
+        <h1 className="break-words text-2xl font-bold">{name}</h1>
         <p className="text-sm text-neutral-500">
           {locale === "ar" ? <span dir="ltr">{product.name_latin}</span> : product.name_ar} · {category}
         </p>
@@ -189,8 +194,8 @@ export default async function ProductPage({ params }: Props) {
                 <tr>
                   <th scope="col" className="px-3 py-2.5 text-start font-medium">{dict.product.governorate}</th>
                   <th scope="col" className="px-3 py-2.5 text-start font-medium">{dict.product.median}</th>
-                  <th scope="col" className="px-3 py-2.5 text-start font-medium">{dict.product.min}</th>
-                  <th scope="col" className="px-3 py-2.5 text-start font-medium">{dict.product.count}</th>
+                  <th scope="col" className="hidden px-3 py-2.5 text-start font-medium sm:table-cell">{dict.product.min}</th>
+                  <th scope="col" className="hidden px-3 py-2.5 text-start font-medium sm:table-cell">{dict.product.count}</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,8 +205,8 @@ export default async function ProductPage({ params }: Props) {
                       {govName(s.governorate_id)}
                     </th>
                     <td className="px-3 py-2.5 tabular-nums">{formatTnd(s.median_millimes, locale)}</td>
-                    <td className="px-3 py-2.5 tabular-nums">{formatTnd(s.min_millimes, locale)}</td>
-                    <td className="px-3 py-2.5 tabular-nums">{s.samples}</td>
+                    <td className="hidden px-3 py-2.5 tabular-nums sm:table-cell">{formatTnd(s.min_millimes, locale)}</td>
+                    <td className="hidden px-3 py-2.5 tabular-nums sm:table-cell">{s.samples}</td>
                   </tr>
                 ))}
               </tbody>
@@ -235,6 +240,37 @@ export default async function ProductPage({ params }: Props) {
           </ul>
         </section>
       )}
+
+      {reports.length > 0 && (
+        <section aria-labelledby="reports" className="space-y-2">
+          <h2 id="reports" className="text-lg font-semibold">
+            {dict.product.reportsTitle}
+          </h2>
+          <p className="text-xs text-neutral-500">{dict.product.reportsText}</p>
+          <ul className="divide-y divide-neutral-200 rounded-xl border border-amber-200 bg-amber-50 text-sm">
+            {reports.map((r, i) => (
+              <li key={`${r.created_at}-${i}`} className="flex items-center justify-between gap-3 px-4 py-3">
+                <span className="font-medium text-amber-900">
+                  {dict.report.reasons[r.reason as keyof typeof dict.report.reasons] ?? r.reason}
+                </span>
+                <span className="text-xs text-amber-900/80">
+                  {govName(r.governorate_id)} · {formatDate(r.created_at, locale)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="flex flex-col gap-2.5 rounded-xl border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-neutral-600">{dict.product.reportCta}</p>
+        <Link
+          href={`/${locale}/report?product=${encodeURIComponent(product.slug)}`}
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 px-4 text-sm font-semibold hover:border-brand hover:text-brand-text"
+        >
+          {dict.product.reportCtaButton}
+        </Link>
+      </div>
 
       <Link
         href={`/${locale}/submit?product=${encodeURIComponent(product.slug)}`}

@@ -33,7 +33,7 @@ export default async function HomePage({ params }: Props) {
     <div className="space-y-7">
       <section className="space-y-4">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold leading-snug text-neutral-900">{dict.home.title}</h1>
+          <h1 className="break-words text-2xl font-bold leading-snug text-neutral-900">{dict.home.title}</h1>
           <p className="text-sm text-neutral-600">{dict.tagline}</p>
         </div>
         <SearchBox locale={locale} />
@@ -45,7 +45,7 @@ export default async function HomePage({ params }: Props) {
             <Link
               key={c}
               href={`/${locale}/search?category=${encodeURIComponent(c)}`}
-              className="shrink-0 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-sm hover:border-brand hover:text-brand-text"
+              className="inline-flex h-10 shrink-0 items-center rounded-full border border-neutral-300 bg-white px-4 text-sm hover:border-brand hover:text-brand-text"
             >
               {categoryLabel(c, locale)}
             </Link>

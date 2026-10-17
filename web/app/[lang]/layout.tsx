@@ -79,7 +79,7 @@ export default async function LocaleLayout({
       </head>
       <body className="flex min-h-dvh flex-col bg-neutral-50 text-neutral-900 antialiased">
         <SiteHeader locale={locale} />
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5">{children}</main>
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5 sm:px-6 md:max-w-5xl md:pb-10 md:pt-8">{children}</main>
         <SiteFooter locale={locale} />
         <BottomNav locale={locale} />
       </body>

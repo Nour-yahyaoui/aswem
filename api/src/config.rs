@@ -7,6 +7,8 @@ pub struct Config {
     pub submit_token: String,
     pub port: u16,
     pub submit_per_hour: u32,
+    /// Optional. When unset, the moderation endpoints are disabled.
+    pub admin_token: Option<String>,
 }
 
 impl Config {
@@ -34,11 +36,14 @@ impl Config {
             Err(_) => 10,
         };
 
+        let admin_token = env::var("ADMIN_TOKEN").ok().filter(|t| !t.is_empty());
+
         Ok(Self {
             database_url,
             submit_token,
             port,
             submit_per_hour,
+            admin_token,
         })
     }
 }

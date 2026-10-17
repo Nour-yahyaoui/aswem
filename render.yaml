@@ -17,5 +17,7 @@ services:
         value: "10"
       - key: DATABASE_URL
         sync: false # Neon pooled connection string, with sslmode=require
+      - key: ADMIN_TOKEN
+        sync: false # optional: enables the moderation endpoints; leave unset to disable them
       - key: SUBMIT_TOKEN
         sync: false # any secret value, must match SUBMIT_TOKEN on Vercel

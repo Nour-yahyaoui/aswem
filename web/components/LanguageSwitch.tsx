@@ -15,7 +15,7 @@ export function LanguageSwitch({ current }: { current: Locale }) {
       href={`/${target}${rest}`}
       hrefLang={target === "ar" ? "ar-TN" : "fr-TN"}
       lang={target === "ar" ? "ar-TN" : "fr-TN"}
-      className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium hover:border-brand hover:text-brand-text"
+      className="inline-flex h-9 items-center rounded-full border border-neutral-300 px-3 text-xs font-medium hover:border-brand hover:text-brand-text"
     >
       {t(target).languageName}
     </Link>

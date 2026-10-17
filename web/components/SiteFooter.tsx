@@ -5,8 +5,8 @@ import { SITE } from "@/lib/site";
 export function SiteFooter({ locale }: { locale: Locale }) {
   const dict = t(locale);
   return (
-    <footer className="mt-auto border-t border-neutral-200 bg-white pb-24">
-      <div className="mx-auto max-w-3xl space-y-2 px-4 py-6 text-sm text-neutral-600">
+    <footer className="mt-auto border-t border-neutral-200 bg-white pb-24 md:pb-6">
+      <div className="mx-auto max-w-3xl space-y-2 px-4 py-6 text-sm text-neutral-600 sm:px-6 md:max-w-5xl">
         <p>{fill(dict.footer.free, { name: dict.brand })}</p>
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span>

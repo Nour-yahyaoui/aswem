@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { clientIpFrom } from "@/lib/client-ip";
 import { DEFAULT_LOCALE, isLocale, t, type Locale } from "@/lib/i18n";
 
 export type SubmitState =
@@ -53,7 +54,7 @@ export async function submitPrice(_prev: SubmitState, formData: FormData): Promi
   if (!apiUrl || !token) return fail(e.unavailable);
 
   const h = await headers();
-  const clientIp = (h.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
+  const clientIp = clientIpFrom(h.get("x-forwarded-for"));
 
   let res: Response;
   try {
