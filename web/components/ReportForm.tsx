@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitReport, type ReportState } from "@/app/[lang]/report/actions";
+import { useToast } from "@/components/Toast";
 import { governorateName, productName, t, type Locale } from "@/lib/i18n";
 import type { Governorate, Product } from "@/lib/types";
 
@@ -28,6 +29,12 @@ export function ReportForm({
   const [state, action, pending] = useActionState(submitReport, initial);
   const [productId, setProductId] = useState(defaultProductId ? String(defaultProductId) : "");
   const formRef = useRef<HTMLFormElement>(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (state.status === "ok") toast.show("success", dict.successTitle);
+    if (state.status === "error") toast.show("error", state.message);
+  }, [state, toast, dict.successTitle]);
 
   useEffect(() => {
     if (state.status === "ok") {

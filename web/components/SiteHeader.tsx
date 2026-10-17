@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AboutButton } from "@/components/AboutButton";
 import { DesktopNav } from "@/components/DesktopNav";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -19,6 +20,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           <span className="hidden text-xs text-neutral-500 lg:inline" dir="ltr">
             {dict.brandLatin}
           </span>
+          <AboutButton locale={locale} />
           <LanguageSwitch current={locale} />
           <ThemeToggle locale={locale} />
         </div>

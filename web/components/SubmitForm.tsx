@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitPrice, type SubmitState } from "@/app/[lang]/submit/actions";
+import { useToast } from "@/components/Toast";
 import { fill, governorateName, productName, t, type Locale } from "@/lib/i18n";
 import { nearestGovernorate } from "@/lib/geo";
 import type { Governorate, Product } from "@/lib/types";
@@ -32,6 +33,12 @@ export function SubmitForm({
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (state.status === "ok") toast.show("success", dict.successTitle);
+    if (state.status === "error") toast.show("error", state.message);
+  }, [state, toast, dict.successTitle]);
 
   useEffect(() => {
     if (state.status === "ok") {

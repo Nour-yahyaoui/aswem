@@ -37,3 +37,21 @@ describe("tryApiGet", () => {
     await expect(tryApiGet<{ id: number }[]>("/products")).resolves.toEqual({ data: [{ id: 1 }], failed: false });
   });
 });
+
+describe("retries", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("retries a cold-start failure and then succeeds", async () => {
+    vi.stubEnv("API_URL", "https://api.example.test");
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError("fetch failed"))
+      .mockResolvedValueOnce(new Response(JSON.stringify([{ id: 2 }]), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(tryApiGet<{ id: number }[]>("/products")).resolves.toEqual({ data: [{ id: 2 }], failed: false });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});

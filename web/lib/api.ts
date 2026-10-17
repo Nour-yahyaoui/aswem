@@ -1,5 +1,7 @@
 import "server-only";
 
+import { fetchWithRetry } from "@/lib/retry";
+
 export class ApiUnavailableError extends Error {
   constructor(message: string) {
     super(message);
@@ -20,10 +22,15 @@ function baseUrl(): string {
 export async function apiGet<T>(path: string, revalidateSeconds = 300): Promise<T | null> {
   let res: Response;
   try {
-    res = await fetch(`${baseUrl()}/api/v1${path}`, {
-      next: { revalidate: revalidateSeconds },
-      headers: { Accept: "application/json" },
-    });
+    // Retries absorb free-tier cold starts; each attempt has its own timeout.
+    res = await fetchWithRetry(
+      `${baseUrl()}/api/v1${path}`,
+      {
+        next: { revalidate: revalidateSeconds },
+        headers: { Accept: "application/json" },
+      },
+      { attempts: 3, timeoutMs: 10_000, baseDelayMs: 250 },
+    );
   } catch {
     throw new ApiUnavailableError("API unreachable");
   }

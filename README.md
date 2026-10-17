@@ -95,6 +95,8 @@ CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull req
 
 - **Web (`web/`):** Next.js App Router on Vercel. Every public page lives under `app/[lang]/` (`ar` default, `fr`). `middleware.ts` redirects `/` by `Accept-Language`. Pages are statically cached for 5 minutes and fall back to an empty state if the API is down. Security headers and the CSP are in `next.config.ts`.
 - **API (`api/`):** Actix Web on Render. Postgres via sqlx with static SQL only. Migrations run at startup. Writes (prices, reports) need `X-Aswem-Token` and are rate limited per client IP. Admin routes exist only when `ADMIN_TOKEN` is set. Rate limits are in memory, so they are per instance.
+- **Status (`/status`):** shows the API and database health (`/healthz`) with latency, and a browser speed test against the web server.
+- **Shopping list (`/list`):** the list is stored in the browser only. The advisor compares the observed medians per governorate and adds a trip cost. The rules (cost per km, maximum distance, minimum saving) are in `web/lib/advisor.ts` as `ADVISOR_RULES`. They are assumptions, and the page explains them to users.
 - **Database (Neon):** governorates and products are reference data (seeded). Prices and reports are user data. Prices are stored as integer millimes. Positions are rounded to 3 decimals.
 
 ## Moderation

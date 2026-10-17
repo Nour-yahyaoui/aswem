@@ -1,5 +1,6 @@
 "use client";
 
+import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { t, type Locale } from "@/lib/i18n";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
@@ -24,35 +25,17 @@ export function ThemeToggle({ locale }: { locale: Locale }) {
     setDark(next);
   }
 
+  const label = dark ? dict.light : dict.dark;
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={dark ? dict.light : dict.dark}
-      title={dark ? dict.light : dict.dark}
+      aria-label={label}
+      title={label}
       aria-pressed={dark}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand-text"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-700 hover:border-brand hover:text-brand-text dark:border-neutral-700 dark:text-neutral-200"
     >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        {dark ? (
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-        ) : (
-          <>
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-          </>
-        )}
-      </svg>
+      {dark ? <Moon size={16} aria-hidden="true" /> : <Sun size={16} aria-hidden="true" />}
     </button>
   );
 }

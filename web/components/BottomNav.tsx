@@ -13,33 +13,22 @@ export function BottomNav({ locale }: { locale: Locale }) {
   return (
     <nav
       aria-label={dict.nav.label}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/95 md:hidden"
     >
-      <ul className="mx-auto grid max-w-3xl grid-cols-4">
+      <ul className="mx-auto grid max-w-3xl grid-cols-5">
         {navItems(locale).map((item) => {
           const active = isActive(pathname, locale, item.key);
+          const Icon = item.icon;
           return (
             <li key={item.key}>
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-xs font-medium ${
-                  active ? "text-brand-text" : "text-neutral-500 hover:text-neutral-800"
+                className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium ${
+                  active ? "text-brand-text" : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
                 }`}
               >
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={active ? 2.2 : 1.8}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d={item.icon} />
-                </svg>
+                <Icon size={22} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>
             </li>

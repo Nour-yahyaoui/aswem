@@ -30,6 +30,10 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             {dict.footer.about}
           </Link>
           {" · "}
+          <Link href={`/${locale}/status`} className="underline-offset-4 hover:underline">
+            {dict.ui.statusLink}
+          </Link>
+          {" · "}
           <a href={SITE.repo} target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
             {dict.footer.sourceCode}
           </a>

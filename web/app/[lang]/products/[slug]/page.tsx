@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PriceDelta } from "@/components/PriceDelta";
+import { PriceTicker } from "@/components/PriceTicker";
 import { Unavailable } from "@/components/Unavailable";
 import { tryApiGet } from "@/lib/api";
 import { categoryLabel, fill, governorateName, productName, t, type Locale } from "@/lib/i18n";
 import { formatDate, formatTnd } from "@/lib/format";
 import { parseLocale } from "@/lib/locale";
 import { jsonLd } from "@/lib/jsonld";
+import { previousFor } from "@/lib/trading";
 import { pageAlternates } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import type { Governorate, GovStat, PriceReport, Product, ProductPrices, PublicReport } from "@/lib/types";
@@ -183,6 +186,8 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </section>
 
+      {stats.length > 0 && <PriceTicker locale={locale} stats={stats} govName={govName} />}
+
       {stats.length > 0 ? (
         <section aria-labelledby="by-gov" className="space-y-2">
           <h2 id="by-gov" className="text-lg font-semibold">
@@ -234,7 +239,13 @@ export default async function ProductPage({ params }: Props) {
                   </p>
                   <p className="text-xs text-neutral-500">{formatDate(r.created_at, locale)}</p>
                 </div>
-                <p className="shrink-0 font-semibold tabular-nums">{formatTnd(r.price_millimes, locale)}</p>
+                <div className="shrink-0 space-y-1 text-end">
+                  <p className="font-semibold tabular-nums">{formatTnd(r.price_millimes, locale)}</p>
+                  {(() => {
+                    const change = previousFor(recent, r);
+                    return change ? <PriceDelta delta={change} locale={locale} label={dict.ui.trading.vsPrevious} /> : null;
+                  })()}
+                </div>
               </li>
             ))}
           </ul>

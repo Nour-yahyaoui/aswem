@@ -3,6 +3,7 @@ import "../globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ToastProvider } from "@/components/Toast";
 import { dirOf, LOCALES, t } from "@/lib/i18n";
 import { parseLocale } from "@/lib/locale";
 import { SITE } from "@/lib/site";
@@ -84,16 +85,18 @@ export default async function LocaleLayout({
         >
           {dict.skipToContent}
         </a>
-        <SiteHeader locale={locale} />
-        <main
+        <ToastProvider dismissLabel={dict.ui.toastDismiss}>
+          <SiteHeader locale={locale} />
+          <main
           id="main"
           tabIndex={-1}
           className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-5 outline-none sm:px-6 md:max-w-5xl md:pb-10 md:pt-8"
         >
           {children}
-        </main>
-        <SiteFooter locale={locale} />
-        <BottomNav locale={locale} />
+          </main>
+          <SiteFooter locale={locale} />
+          <BottomNav locale={locale} />
+        </ToastProvider>
       </body>
     </html>
   );
